@@ -1,0 +1,10 @@
+pycache/
+*.py[cod]
+*$py.class
+
+#venv
+venv/
+.venv/
+
+# Django stuff:
+db.sqlite3

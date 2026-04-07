@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}Student List - Student Platform{% endblock %}
+
+{% block content %}
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Course</th>
+            <th>Grade</th>
+        </tr>
+        {% for student in students %}
+        <tr>
+            <td>{{ student.name }}</td>
+            <td>{{ student.email }}</td>
+            <td>{{ student.course }}</td>
+            <td>{{ student.grade }}</td>
+        </tr>
+        {% endfor %}
+    </thead>
+</table>
+
+{% endblock %}
