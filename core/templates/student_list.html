@@ -5,7 +5,19 @@
 {% block content %}
 
 <h1>Student List</h1>
-<h2>Total Students: {{ total_students }}</h2>
+
+<p>Total students: {{ total_students }}</p>
+
+<div>
+    <a href="{% url 'student_list' %}">All Courses</a>
+    {% for course in courses %}
+        <a href="{% url 'student_list' %}?course={{ course.id }}">{{ course.name }} ({{ course.student_count }})</a>
+    {% endfor %}
+</div>
+
+{% if selected_course %}
+<p>Showing students for {{ selected_course.name }}</p>
+{% endif %}
 
 <table>
     <thead>
@@ -14,16 +26,33 @@
             <th>Email</th>
             <th>Course</th>
             <th>Grade</th>
+            <th>Actions</th>
         </tr>
+    </thead>
+    <tbody>
         {% for student in students %}
         <tr>
-            <td>{{ student.name }}</td>
+            <td>
+                {% if student.id %}
+                    <a href="{% url 'student_detail' student.id %}">{{ student.name }}</a>
+                {% else %}
+                    {{ student.name }}
+                {% endif %}
+            </td>
             <td>{{ student.email }}</td>
-            <td>{{ student.course }}</td>
+            <td>{{ student.course.name }}</td>
             <td>{{ student.grade }}</td>
+            <td>
+                <a href="{% url 'edit_student' student.id %}">Edit</a>
+                <a href="{% url 'delete_student' student.id %}" onclick="return confirm('Are you sure?')">Delete</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4">No students found.</td>
         </tr>
         {% endfor %}
-    </thead>
+    </tbody>
 </table>
 
 {% endblock %}

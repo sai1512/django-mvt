@@ -8,3 +8,7 @@ venv/
 
 # Django stuff:
 db.sqlite3
+
+
+#ignore notes text file
+notes.txt

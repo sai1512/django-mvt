@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}Course - {{ course.name }}{% endblock %}
+
+{% block content %}
+<h1>{{ course.name }}</h1>
+<p><strong>Code:</strong> {{ course.code }}</p>
+<p><strong>Description:</strong> {{ course.description }}</p>
+<p><strong>Enrolled Students:</strong> {{ students|length }}</p>
+
+<h2>Students</h2>
+<ul>
+    {% for student in students %}
+    <li><a href="{% url 'student_detail' student.id %}">{{ student.name }}</a></li>
+    {% empty %}
+    <li>No students enrolled in this course.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

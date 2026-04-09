@@ -1,199 +1,106 @@
-# Student Management Platform — Phase 1
+# Student Management Platform — Phase 3
 
 ## Overview
 
-Build a Django web application that displays and manages student information. This is the **starting point of your final project** — we'll keep building on this throughout the course.
+Add a **REST API** to your student platform using Django REST Framework. Your app will serve both HTML pages (for browsers) and JSON data (for other software).
 
-For now, all data is **hardcoded** in your views (lists of dictionaries). Tomorrow we'll replace this with a real database.
+---
+
+## What Changes From Yesterday
+
+| Yesterday (Phase 2) | Today (Phase 3) |
+|---|---|
+| Data only accessible via HTML pages | Data also accessible via JSON API |
+| No API endpoints | Full CRUD API for students and courses |
 
 ---
 
 ## Setup
 
 ```bash
-# Create project folder and virtual environment
-mkdir studentplatform && cd studentplatform
-python -m venv venv
-source venv/bin/activate        # Mac/Linux
-# .\venv\Scripts\activate       # Windows
-
-# Install Django
-pip install django
-
-# Create the project (the dot creates it in the current folder)
-django-admin startproject studentplatform .
-
-# Create the core app
-python manage.py startapp core
-
-# Run the dev server
-python manage.py runserver
+pip install djangorestframework
 ```
 
-Don't forget to add `'core'` to `INSTALLED_APPS` in `settings.py`.
-
----
-
-## Requirements
-
-### Pages to build
-
-| Page | URL | Description |
-|------|-----|-------------|
-| Home | `/` | Welcome message with navigation |
-| About | `/about/` | Course information |
-| Students list | `/students/` | Table of all students |
-| Student detail | `/students/<id>/` | Full details for one student |
-| Add student | `/students/add/` | Form to add a new student |
-
-### Technical requirements
-
-1. **Project structure**
-   - Django project called `studentplatform`
-   - App called `core`
-   - `core/urls.py` with all routes (included from the project `urls.py`)
-
-2. **Views** (`core/views.py`)
-   - Use the hardcoded `STUDENTS` list below as your data source
-   - Each view uses `render()` to return a template with context data
-   - The add student view handles both GET (show form) and POST (process form)
-   - The detail view returns a 404 if the student ID doesn't exist
-
-3. **Templates** (`core/templates/`)
-   - `base.html` — shared layout with nav bar, CSS link, `{% block title %}` and `{% block content %}`
-   - `home.html` — extends base, welcome message
-   - `about.html` — extends base, course info
-   - `student_list.html` — extends base, students in a `<table>` with links to detail pages
-   - `student_detail.html` — extends base, shows all fields for one student
-   - `add_student.html` — extends base, form with `{% csrf_token %}`
-
-4. **Static files** (`core/static/css/style.css`)
-   - Basic styling: fonts, table formatting, nav bar, form styling
-   - Loaded in `base.html` with `{% load static %}`
-
-5. **Navigation**
-   - Every page has a nav bar (from `base.html`) with links to Home, Students, Add Student
-   - Use `{% url 'name' %}` for all links — no hardcoded paths
-
----
-
-## Student Data
-
-Use this at the top of `views.py`:
-
+Add to `settings.py`:
 ```python
-STUDENTS = [
-    {
-        "id": 1,
-        "name": "Ada Lovelace",
-        "email": "ada@example.com",
-        "course": "Computer Science",
-        "grade": "A",
-    },
-    {
-        "id": 2,
-        "name": "Alan Turing",
-        "email": "alan@example.com",
-        "course": "Mathematics",
-        "grade": "A+",
-    },
-    {
-        "id": 3,
-        "name": "Grace Hopper",
-        "email": "grace@example.com",
-        "course": "Engineering",
-        "grade": "B+",
-    },
-    {
-        "id": 4,
-        "name": "Linus Torvalds",
-        "email": "linus@example.com",
-        "course": "Operating Systems",
-        "grade": "A",
-    },
+INSTALLED_APPS = [
+    ...,
+    'rest_framework',
 ]
 ```
 
 ---
 
-## File structure
+## Files to Create
 
-When you're done, your project should look like this:
+You need **three new files** in your `core/` folder. Use the boilerplate from this repo as your starting point.
 
-```
-studentplatform/
-├── manage.py
-├── studentplatform/
-│   ├── settings.py
-│   ├── urls.py
-│   └── ...
-└── core/
-    ├── urls.py              ← you create this
-    ├── views.py
-    ├── templates/
-    │   ├── base.html
-    │   ├── home.html
-    │   ├── about.html
-    │   ├── student_list.html
-    │   ├── student_detail.html
-    │   └── add_student.html
-    └── static/
-        └── css/
-            └── style.css
+| New File | Purpose |
+|---|---|
+| `core/serializers.py` | Converts models to JSON and validates input |
+| `core/api_views.py` | Handles API requests using DRF generic views |
+| `core/api_urls.py` | Maps URL patterns to API views |
+
+Then add this line to `studentplatform/urls.py`:
+```python
+path('api/', include('core.api_urls')),
 ```
 
 ---
 
-## Hints
+## Requirements
 
-- **Template inheritance**: `base.html` contains everything shared (doctype, head, nav, footer). Child templates use `{% extends 'base.html' %}` and fill in `{% block content %}`.
+### Serializers
+- Create a `StudentSerializer` using `ModelSerializer`
+- Create a `CourseSerializer` using `ModelSerializer`
+- Use `fields = '__all__'` to include all model fields
 
-- **Linking to detail pages**: In `student_list.html`, use:
-  ```html
-  <a href="{% url 'student_detail' student.id %}">{{ student.name }}</a>
-  ```
+### API Views
+For each model you need two views using DRF generics:
+- `ListCreateAPIView` — handles GET (list) and POST (create)
+- `RetrieveUpdateDestroyAPIView` — handles GET (one), PUT, PATCH, DELETE
 
-- **Finding a student by ID**: In the detail view, loop through `STUDENTS` to find the one with the matching `id`. Return a 404 if not found:
-  ```python
-  from django.http import HttpResponse
+### API URLs
+Wire up your views with `path()`:
+- `/api/students/` → list + create
+- `/api/students/<int:pk>/` → retrieve + update + delete
+- `/api/courses/` → list + create
+- `/api/courses/<int:pk>/` → retrieve + update + delete
 
-  def student_detail(request, student_id):
-      student = None
-      for s in STUDENTS:
-          if s["id"] == student_id:
-              student = s
-      if student is None:
-          return HttpResponse("Student not found", status=404)
-      return render(request, "student_detail.html", {"student": student})
-  ```
+Remember: DRF uses `pk` (primary key) in URL patterns, not `student_id`.
 
-- **Handling the add form**: The same view handles GET (show the form) and POST (process it):
-  ```python
-  from django.shortcuts import render, redirect
-
-  def add_student(request):
-      if request.method == "POST":
-          STUDENTS.append({
-              "id": len(STUDENTS) + 1,
-              "name": request.POST.get("name"),
-              "email": request.POST.get("email"),
-              "course": request.POST.get("course"),
-              "grade": request.POST.get("grade"),
-          })
-          return redirect("student_list")
-      return render(request, "add_student.html")
-  ```
-
-- **CSRF token**: Every `<form method="POST">` needs `{% csrf_token %}` inside it, or Django will reject the submission.
-
-- **Data won't persist**: Since we're using a Python list, added students disappear when you restart the server. That's expected — tomorrow we add a database.
+### Testing
+Once everything is wired up:
+1. Visit http://127.0.0.1:8000/api/students/ in your browser — you should see the browsable API
+2. Try creating a student through the browsable API form
+3. Try curl from the terminal:
+   ```bash
+   curl http://127.0.0.1:8000/api/students/
+   curl http://127.0.0.1:8000/api/students/1/
+   curl -X POST http://127.0.0.1:8000/api/students/ \
+     -H "Content-Type: application/json" \
+     -d '{"name":"Test","email":"test@test.com","grade":"A","course":1}'
+   curl -X DELETE http://127.0.0.1:8000/api/students/1/
+   ```
 
 ---
 
-## Bonus challenges
+## Bonus Challenges
 
-- [ ] **Delete student**: Add a delete button/link on the detail page that removes a student
-- [ ] **Edit student**: Create an edit form pre-filled with existing data that updates on submit
-- [ ] **Search**: Add a search box on the student list that filters by name
-- [ ] **Student count**: Show the total number of students in the nav bar or list page header
-- [ ] **Styling**: Make it look good — add colors, spacing, hover effects on the table rows
+- [ ] **Nested endpoint** — add `/api/courses/<pk>/students/` using `ListAPIView` with a filtered queryset
+- [ ] **Filtering** — filter students by grade or active status via query parameters
+- [ ] **Search** — search students by name or email
+- [ ] **Pagination** — configure DRF to paginate list responses
+
+---
+
+## When You're Done
+
+```bash
+pip freeze > requirements.txt
+git add .
+git commit -m "Session 5: REST API with DRF, serializers, generic views"
+git push
+```
+
+**Tomorrow**: Authentication, security, encoding, and encryption.

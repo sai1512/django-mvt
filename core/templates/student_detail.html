@@ -5,7 +5,9 @@
 {% block content %}
     <h1>{{ student.name }}</h1>
     <p><strong>Email:</strong> {{ student.email }}</p>
-    <p><strong>Course:</strong> {{ student.course }}</p>
+    <p><strong>Course:</strong> <a href="{% url 'course_detail' student.course.id %}">{{ student.course.name }}</a></p>
     <p><strong>Grade:</strong> {{ student.grade }}</p>
+    <a href="{% url 'edit_student' student.id %}">Edit</a>
+    <a href="{% url 'delete_student' student.id %}" onclick="return confirm('Are you sure?')">Delete</a>
     <a href="{% url 'student_list' %}">Back to list</a>
 {% endblock %}

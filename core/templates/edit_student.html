@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Student - {{ student.name }}{% endblock %}
+
+{% block content %}
+<h1>Edit Student</h1>
+<form method="POST">
+    {% csrf_token %}
+    <label for="name">Name:</label><br>
+    <input type="text" id="name" name="name" value="{{ student.name }}" required><br><br>
+
+    <label for="email">Email:</label><br>
+    <input type="email" id="email" name="email" value="{{ student.email }}" required><br><br>
+
+    <label for="date_of_birth">Date of Birth:</label><br>
+    <input type="date" id="date_of_birth" name="date_of_birth" value="{{ student.date_of_birth|date:'Y-m-d' }}"><br><br>
+
+    <label for="grade">Grade:</label><br>
+    <input type="text" id="grade" name="grade" value="{{ student.grade }}" required><br><br>
+
+    <label for="course_id">Course:</label><br>
+    <select id="course_id" name="course_id" required>
+        {% for course in courses %}
+        <option value="{{ course.id }}" {% if course.id == student.course.id %}selected{% endif %}>{{ course.name }}</option>
+        {% endfor %}
+    </select><br><br>
+
+    <label for="is_active">Active:</label>
+    <input type="checkbox" id="is_active" name="is_active" {% if student.is_active %}checked{% endif %}><br><br>
+
+    <button type="submit">Save Changes</button>
+</form>
+<a href="{% url 'student_detail' student.id %}">Cancel</a>
+{% endblock %}
