@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 
 class Student(models.Model):
@@ -11,6 +12,13 @@ class Student(models.Model):
         'Course',
         on_delete=models.CASCADE,
         related_name='students',
+    )
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='created_students',
+        null=True,
+        blank=True,
     )
     created_at = models.DateTimeField(auto_now_add=True)
 

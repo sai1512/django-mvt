@@ -6,6 +6,9 @@ pycache/
 venv/
 .venv/
 
+#environment variables
+.env
+
 # Django stuff:
 db.sqlite3
 

@@ -1,4 +1,8 @@
 from django.urls import path
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
 from .api_views import (
     CourseStudentsListAPIView,
     StudentListCreateAPIView,
@@ -8,6 +12,13 @@ from .api_views import (
 )
 
 urlpatterns = [
+
+    # JWT Authentication endpoints
+    path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+
+    
+    
 
     # API endpoints for Student model
     path('students/', StudentListCreateAPIView.as_view(), name='student-list-create'),
