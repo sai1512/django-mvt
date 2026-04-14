@@ -1,0 +1,51 @@
+# Session 7 — Docker Compose for Student Platform
+# This runs Django + PostgreSQL as two connected containers
+
+services:
+
+  # --- Database Service ---
+  # TODO: configure the PostgreSQL container
+  # Use image: postgres:16
+  # Set environment variables: POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD
+  #   (these should match the DB_ values in your .env)
+  # Add a volume to persist data: pgdata:/var/lib/postgresql/data
+  # Expose port 5432
+  db:
+    image: postgres:16
+    # TODO: add environment, volumes, and ports
+    environment:
+      POSTGRES_DB: studentplatform
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres1234
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+
+
+  # --- Web Service (Django) ---
+  # TODO: configure the Django container
+  # Build from the Dockerfile in the current directory
+  # Map port 8000 to port 8000
+  # Load environment variables from .env
+  # Make it start after the db service
+  web:
+    build: .
+    # TODO: add ports, env_file, depends_on
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      - db
+
+
+# --- Volumes ---
+# Declare the named volume for PostgreSQL data persistence
+# TODO: declare the pgdata volume
+# volumes:
+#   pgdata:
+
+volumes:
+  pgdata:

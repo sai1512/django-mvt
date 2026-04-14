@@ -41,7 +41,7 @@ class StudentListCreateAPIView(generics.ListCreateAPIView):
         return queryset
 
     def perform_create(self, serializer):
-        # Automatically set created_by to the current user
+        # set created_by to the current user
         serializer.save(created_by=self.request.user)
 
 class StudentRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):

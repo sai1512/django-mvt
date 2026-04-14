@@ -29,7 +29,6 @@ def about(request):
 def student_list(request):
     selected_course_id = request.GET.get('course')
     # students = Student.objects.select_related('course').order_by('name')
-    # students = Student.objects.select_related('course').filter(created_by=request.user).order_by('name')
     if request.user.is_staff:
         students = Student.objects.select_related('course').order_by('name')
     else:
@@ -41,7 +40,6 @@ def student_list(request):
         selected_course = Course.objects.filter(id=selected_course_id).first()
 
     # courses = Course.objects.annotate(student_count=Count('students')).order_by('name')
-    # courses = Course.objects.annotate(student_count=Count('students', filter=Q(students__created_by=request.user))).order_by('name')
     if request.user.is_staff:
         courses = Course.objects.annotate(student_count=Count('students')).order_by('name')
     else:
@@ -113,7 +111,7 @@ def edit_student(request, student_id):
 @login_required
 def delete_student(request, student_id):
     if not request.user.is_staff:
-        return HttpResponseForbidden('Regular users can only view students.')
+        return HttpResponseForbidden('Only admin users can delete students.')
 
     # student = get_object_or_404(Student, id=student_id, created_by=request.user)
     student = get_object_or_404(Student, id=student_id)
@@ -129,7 +127,6 @@ def course_list(request):
 def course_detail(request, course_id):
     course = get_object_or_404(Course, id=course_id)
     # students = course.students.select_related('course').order_by('name')
-    # students = course.students.select_related('course').filter(created_by=request.user).order_by('name')
     if request.user.is_staff:
         students = course.students.select_related('course').order_by('name')
     else:
